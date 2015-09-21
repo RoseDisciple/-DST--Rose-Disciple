@@ -69,24 +69,18 @@ local function oneat(inst, food)
          
         if healthvalue and not healthvalue == 0 then -- If the food item has a health value, and it isn't 0
             if healthvalue >= 0 then -- If the food item's health value is over 0
-            inst.components.health:DoDelta(healthvalue * 7.5) -- Multiplies food's health value by 1.5
-            else -- If the food item's health value is below 0
-            inst.components.health:DoDelta(healthvalue * -9.5) -- Multiplies food's health value by 1.5 and makes it positive
+				inst.components.health:DoDelta(healthvalue * 1.5) -- Multiplies food's health value by 1.5
             end
         end
         if hungervalue and not hungervalue == 0 then
             if hungervalue >= 0 then
-            inst.components.hunger:DoDelta(hungervalue * 7.5) -- Multiplies food's hunger value by 1.5
-            else
-            inst.components.hunger:DoDelta(hungervalue * -9.5) -- Multiplies food's hunger value by 1.5 and makes it positive
-            end
+				inst.components.hunger:DoDelta(hungervalue * 1.5) -- Multiplies food's hunger value by 1.5
+			end
         end
         if sanityvalue and not sanityvalue == 0 then
             if sanityvalue >= 0 then
-            inst.components.sanity:DoDelta(sanityvalue * 7.5) -- Multiplies food's sanity value by 1.5
-            else
-            inst.components.sanity:DoDelta(sanityvalue * -9.5) -- Multiplies food's sanity value by 1.5 and makes it positive
-            end
+				inst.components.sanity:DoDelta(sanityvalue * 1.5) -- Multiplies food's sanity value by 1.5
+			end
         end
     end
 end
@@ -100,30 +94,20 @@ end
 -- This initializes for the host only
 local master_postinit = function(inst)
     inst.soundsname = "willow" -- The sounds your character will play
-    inst.components.temperature.inherentinsulation = (TUNING.INSULATION_MED * 5)
-	inst.components.temperature.mintemp = 20
-	inst.components.temperature.maxtemp = 60
-	inst.components.health.fire_damage_scale = 0
-	inst.components.locomotor.walkspeed = (TUNING.WILSON_WALK_SPEED * 5.2)
-	inst.components.locomotor.runspeed = (TUNING.WILSON_RUN_SPEED * 6.3)
-	inst.components.locomotor.triggerscreep = false
-	inst.components.eater.monsterimmune = true
 	
-local OldEat = inst.components.eater.Eat
-inst.components.eater.Eat = function(self, food)
-    if self:CanEat(food) and food.prefab:find("meat") then
-        food.components.edible.healthvalue = food.components.edible.healthvalue + 8
-		food.components.edible.foodvalue = food.components.edible.foodvalue + 8
-		food.components.edible.sanityvalue = food.components.edible.sanityvalue + 8
-    end
-    return OldEat(self, food)
-end
 	-- Uncomment if "wathgrithr"(Wigfrid) or "webber" voice is used
     --inst.talker_path_override = "dontstarve_DLC001/characters/"
     -- Stats    
     inst.components.health:SetMaxHealth(600) -- Base health
     inst.components.hunger:SetMax(600) -- Base hunger
     inst.components.sanity:SetMax(600) -- Base sanity
+	inst.components.temperature.inherentinsulation = (TUNING.INSULATION_MED * 5)
+	inst.components.temperature.mintemp = 20
+	inst.components.temperature.maxtemp = 60
+	inst.components.health.fire_damage_scale = 0
+	inst.components.locomotor.walkspeed = (TUNING.WILSON_WALK_SPEED * 5.2)
+	inst.components.locomotor.runspeed = (TUNING.WILSON_RUN_SPEED * 6.3)
+	inst.components.locomotor.triggerscreep = false
 	
     -- Damage multiplier (optional)
     inst.components.combat.damagemultiplier = 9
@@ -146,8 +130,11 @@ end
      
     -- Add the eater component
     if inst.components.eater == nil then -- If the character doesn't have the component
-    inst:AddComponent("eater") -- Add the component "eater" to let us execute a function when it eats
+		inst:AddComponent("eater") -- Add the component "eater" to let us execute a function when it eats
     end
+	
+	inst.components.eater.strongstomach = true
+	
     -- Execute a function when the character eats
     inst.components.eater:SetOnEatFn(oneat) -- Execute a function when the character eats
      
