@@ -109,6 +109,7 @@ local master_postinit = function(inst)
 		if self:CanEat(food) then
 			if food.components.edible.foodtype == FOODTYPE.MEAT then
 				food.components.edible.healthvalue = food.components.edible.healthvalue * 1.5
+				food.components.edible.hungervalue = food.components.edible.hungervalue * 1.5
 				food.components.edible.sanityvalue = food.components.edible.sanityvalue * 1.5
 			end
 		end
