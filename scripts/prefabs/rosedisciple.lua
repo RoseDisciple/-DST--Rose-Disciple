@@ -109,15 +109,6 @@ local master_postinit = function(inst)
 	inst.components.locomotor.triggerscreep = false
 	inst.components.eater.monsterimmune = true
 	
-local OldEat = inst.components.eater.Eat
-inst.components.eater.Eat = function(self, food)
-    if self:CanEat(food) and food.prefab:find("meat") then
-        food.components.edible.healthvalue = food.components.edible.healthvalue + 8
-		food.components.edible.foodvalue = food.components.edible.foodvalue + 8
-		food.components.edible.sanityvalue = food.components.edible.sanityvalue + 8
-    end
-    return OldEat(self, food)
-end
 	-- Uncomment if "wathgrithr"(Wigfrid) or "webber" voice is used
     --inst.talker_path_override = "dontstarve_DLC001/characters/"
     -- Stats    
