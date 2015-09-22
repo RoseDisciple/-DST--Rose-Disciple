@@ -169,6 +169,7 @@ local master_postinit = function(inst)
      
     -- Hounds don't attack you
     inst:AddTag("hound") -- Add the tag "hound" to the player
+	inst:AddTag("houndwhisperer")
 	
 	-- Eating meat bonus and immunity to negative food stats
 	inst.components.eater.strongstomach = true
