@@ -41,6 +41,8 @@ local start_inv = {
  "tentaclespike",
 }
 
+local heats = { 0, 60, 120, 180, 240 }
+
 -- Wetness Debuff function
 local function onmoisturedelta(inst)
     if inst.components.moisture:IsWet() then -- If the character is wet
@@ -73,6 +75,10 @@ end
 
 local function onsanitydelta(inst, data)
 	updatestats(inst)
+end
+
+local function HeatFn(inst)
+	return inst.components.temperature:GetCurrent() * 3
 end
 
 
@@ -120,6 +126,17 @@ end
  
 -- This initializes for the host only
 local master_postinit = function(inst)
+	
+	inst:AddTag("HASHEATER")
+	
+	inst.entity:SetPristine()
+	
+	if not TheWorld.ismastersim then
+		return inst
+	end
+	
+	inst:AddComponent("heater")
+	inst.components.heater.heatfn = HeatFn
 	
     inst.soundsname = "willow" -- The sounds your character will play
 	
