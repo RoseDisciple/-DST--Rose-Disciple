@@ -1,9 +1,6 @@
-
 local MakePlayerCharacter = require "prefabs/player_common"
 
-
 local assets = {
-
         Asset( "ANIM", "anim/player_basic.zip" ),
         Asset( "ANIM", "anim/player_idles_shiver.zip" ),
         Asset( "ANIM", "anim/player_actions.zip" ),
@@ -42,7 +39,6 @@ local start_inv = {
  "heatrock",
  "orangeamulet",
  "tentaclespike",
-
 }
 
 -- Heat Immunity function
@@ -59,6 +55,68 @@ local function onmoisturedelta(inst)
     end
 end
 
+local function updatestats(inst)
+	if inst.sg:HasStateTag("nomorph") or
+		inst:HasTag("playerghost") or
+		inst.components.health:IsDead() then
+		return
+	end
+	
+	local sanitypercent = inst.components.sanity:GetPercent()
+	if TheWorld.state.isday then
+		inst.Light:Enable(false)
+	elseif TheWorld.state.isdusk then
+		inst.Light:Enable(false)
+	elseif TheWorld.state.isnight then
+		if sanitypercent >= 0.5 then
+			inst.Light:Enable(true)
+		else
+			inst.Light:Enable(false)
+		end
+	end
+end
+
+local function onsanitydelta(inst, data)
+	updatestats(inst)
+end
+
+
+local function onsave(inst, data)
+end
+
+local function onpreload(ins, data)
+end
+
+local function onbecameghost(inst)
+	if inst._wasnomorph ~= nil then
+		inst.wasnomorph = nil
+		inst.talksoundoverride = nil
+		inst.hurtsoundoverride = nil
+		inst:RemoveEventCallback("sanitydelta", onsanitydelta)
+	end
+end
+
+local function onbecamehuman(inst)
+	if inst._wasnomorph == nil then
+		inst._wasnomorph = inst.sg:HasStateTag("nomorph")
+		inst.talksoundoverride = nil
+		inst.hurtsoundoverride = nil
+		inst:ListenForEvent("sanitydelta", onsanitydelta)
+		onsanitydelta(inst, nil, true)
+	end
+end
+
+local function onload(inst)
+	inst:ListenForEvent("ms_respawnedfromghost", onbecamehuman)
+	inst:ListenForEvent("ms_becameghost", onbecameghost)
+	
+	if inst:HasTag("playerghost") then
+		onbecameghost(inst)
+	else
+		onbecamehuman(inst)
+	end
+end
+
 
 -- This initializes for both clients and the host
 local common_postinit = function(inst)
@@ -67,6 +125,7 @@ end
  
 -- This initializes for the host only
 local master_postinit = function(inst)
+	
     inst.soundsname = "willow" -- The sounds your character will play
 	
 	-- Uncomment if "wathgrithr"(Wigfrid) or "webber" voice is used
@@ -102,8 +161,8 @@ local master_postinit = function(inst)
     -- Hounds don't attack you
     inst:AddTag("hound") -- Add the tag "hound" to the player
 	
+	-- Eating meat bonus and immunity to negative food stats
 	inst.components.eater.strongstomach = true
-	
 	inst.components.eater.oldEat = inst.components.eater.Eat
 	function inst.components.eater:Eat(food)
 		if self:CanEat(food) then
@@ -115,7 +174,28 @@ local master_postinit = function(inst)
 		end
 		return inst.components.eater:oldEat(food)
 	end
-     
+	
+	-- Night Vision
+	local light = inst.entity:AddLight()
+	inst.Light:Enable(false)
+    inst.Light:SetIntensity(.75)
+    inst.Light:SetColour(197 / 255, 197 / 255, 50 / 255)
+    inst.Light:SetFalloff(0.5)
+    inst.Light:SetRadius(2)
+	
+	inst:WatchWorldState("daytime", function(inst) updatestats(inst) end , TheWorld)
+	inst:WatchWorldState("dusktime", function(inst) updatestats(inst) end , TheWorld)
+	inst:WatchWorldState("nighttime", function(inst) updatestats(inst) end , TheWorld)
+	updatestats(inst)
+	
+	inst:ListenForEvent("sanitydelta", onsanitydelta)
+	
+	inst.OnSave = onsave
+	inst.OnPreload = onpreload
+	inst.OnLoad = onload
+	
+	return inst
+    
 end
 
 return MakePlayerCharacter("rosedisciple", prefabs, assets, common_postinit, master_postinit, start_inv)
