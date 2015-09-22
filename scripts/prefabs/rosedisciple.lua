@@ -41,11 +41,6 @@ local start_inv = {
  "tentaclespike",
 }
 
--- Heat Immunity function
-local function onstartoverheating(inst)
-    inst.components.temperature:SetTemperature(23) -- Sets the temperature to 23ÂºC
-end
- 
 -- Wetness Debuff function
 local function onmoisturedelta(inst)
     if inst.components.moisture:IsWet() then -- If the character is wet
@@ -135,26 +130,23 @@ local master_postinit = function(inst)
     inst.components.hunger:SetMax(600) -- Base hunger
     inst.components.sanity:SetMax(600) -- Base sanity
 	inst.components.temperature.inherentinsulation = (TUNING.INSULATION_MED * 5)
-	inst.components.temperature.mintemp = 20
-	inst.components.temperature.maxtemp = 60
-	inst.components.health.fire_damage_scale = 0
+	inst.components.temperature.mintemp = 20 -- Cold Immunity
+	inst.components.temperature.maxtemp = 60 -- Heat Immunity
+	inst.components.health.fire_damage_scale = 0 -- Fire Immunity
 	inst.components.locomotor.walkspeed = (TUNING.WILSON_WALK_SPEED * 5.2)
 	inst.components.locomotor.runspeed = (TUNING.WILSON_RUN_SPEED * 6.3)
 	inst.components.locomotor.triggerscreep = false
 	
-    -- Damage multiplier (optional)
+    -- Damage multiplier
     inst.components.combat.damagemultiplier = 9
 	
-	-- Hunger rate (optional)
+	-- Hunger rate
 	inst.components.hunger.hungerrate = 1 * TUNING.WILSON_HUNGER_RATE
 	
     -- Fire Immunity
     inst.components.health.fire_damage_scale = TUNING.WILLOW_FIRE_DAMAGE -- Willow's fire immunity
     inst.components.health.fire_timestart = TUNING.WILLOW_FIRE_IMMUNITY -- Willow's fire immunity
-     
-    -- Heat Immunity
-    inst:ListenForEvent("startoverheating", onstartoverheating) -- Wait for the event saying the character starts overheating, and execute a function when it does
-     
+	
     -- Wetness Debuff
     inst:ListenForEvent("moisturedelta", onmoisturedelta) -- Wait for the event saying the moisture of the character has changed, and execute a function when it does
      
