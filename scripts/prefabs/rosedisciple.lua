@@ -169,7 +169,7 @@ local master_postinit = function(inst)
      
     -- Hounds don't attack you
     inst:AddTag("hound") -- Add the tag "hound" to the player
-	inst:AddTag("houndwhisperer")
+	inst:AddTag("houndwhisperer") -- Tame hounds
 	
 	-- Eating meat bonus and immunity to negative food stats
 	inst.components.eater.strongstomach = true
@@ -177,9 +177,9 @@ local master_postinit = function(inst)
 	function inst.components.eater:Eat(food)
 		if self:CanEat(food) then
 			if food.components.edible.foodtype == FOODTYPE.MEAT then
-				food.components.edible.healthvalue = food.components.edible.healthvalue * 1.5
-				food.components.edible.hungervalue = food.components.edible.hungervalue * 1.5
-				food.components.edible.sanityvalue = food.components.edible.sanityvalue * 1.5
+				food.components.edible.healthvalue = food.components.edible.healthvalue * 2.5
+				food.components.edible.hungervalue = food.components.edible.hungervalue * 2.5
+				food.components.edible.sanityvalue = food.components.edible.sanityvalue * 2.5
 			end
 		end
 		return inst.components.eater:oldEat(food)
@@ -188,10 +188,10 @@ local master_postinit = function(inst)
 	-- Night Vision
 	local light = inst.entity:AddLight()
 	inst.Light:Enable(false)
-    inst.Light:SetIntensity(.75)
+    inst.Light:SetIntensity(.85)
     inst.Light:SetColour(197 / 255, 197 / 255, 50 / 255)
     inst.Light:SetFalloff(0.5)
-    inst.Light:SetRadius(2)
+    inst.Light:SetRadius(3)
 	
 	inst:WatchWorldState("daytime", function(inst) updatestats(inst) end , TheWorld)
 	inst:WatchWorldState("dusktime", function(inst) updatestats(inst) end , TheWorld)
